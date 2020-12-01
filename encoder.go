@@ -8,18 +8,17 @@ import (
 	"io"
 	"math"
 	"reflect"
-	"strconv"
 	"unicode"
 )
 
 type Encoder struct {
-	writer       io.Writer
-	stringCache  map[string]int
-	objectCache  map[uintptr]int
-	reservStruct bool
+	writer        io.Writer
+	stringCache   map[string]int
+	objectCache   map[uintptr]int
+	reserveStruct bool
 }
 
-func (encoder *Encoder) Reset(){
+func (encoder *Encoder) Reset() {
 	encoder.objectCache = make(map[uintptr]int)
 	encoder.stringCache = make(map[string]int)
 }
@@ -35,7 +34,7 @@ func (encoder *Encoder) getFieldName(f reflect.StructField) string {
 		return name
 	}
 
-	if !encoder.reservStruct {
+	if !encoder.reserveStruct {
 		chars[0] = unicode.ToLower(chars[0])
 		return string(chars)
 	}
@@ -67,7 +66,7 @@ func (encoder *Encoder) encodeUint(value uint64) error {
 			return encoder.encodeFloat(float64(value))
 		}
 
-		return encoder.encodeString(strconv.Uitoa64(value))
+		return encoder.encodeString(UInt64ToString(value))
 	}
 
 	err := encoder.writeMarker(INTEGER_MARKER)
@@ -84,7 +83,7 @@ func (encoder *Encoder) encodeInt(value int64) error {
 		if value > -0x7fffffff {
 			return encoder.encodeFloat(float64(value))
 		}
-		return encoder.encodeString(strconv.Itoa64(value))
+		return encoder.encodeString(Int64ToString(value))
 	}
 
 	err := encoder.writeMarker(INTEGER_MARKER)
@@ -376,7 +375,7 @@ func NewEncoder(writer io.Writer, reservStruct bool) *Encoder {
 
 	encoder := new(Encoder)
 	encoder.writer = writer
-	encoder.reservStruct = reservStruct
+	encoder.reserveStruct = reservStruct
 	encoder.Reset()
 	return encoder
 }
